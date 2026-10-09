@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BrowseAI — Chat with any website</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%237c5cff'/><stop offset='1' stop-color='%2322d3ee'/></linearGradient></defs><rect width='32' height='32' rx='9' fill='url(%23g)'/><circle cx='16' cy='16' r='7' fill='none' stroke='white' stroke-width='2.4'/><path d='M9 16h14M16 9c3 3.5 3 10.5 0 14M16 9c-3 3.5-3 10.5 0 14' stroke='white' stroke-width='1.6' fill='none'/></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <div class="app">
+    <!-- ───────────── Sidebar ───────────── -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="logo">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M4 12h16M12 4c3.4 4 3.4 12 0 16M12 4c-3.4 4-3.4 12 0 16"/></svg>
+        </div>
+        <div>
+          <div class="brand-name">BrowseAI</div>
+          <div class="brand-sub">Chat with any website</div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-block" id="newKbBtn">
+        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+        New knowledge base
+      </button>
+
+      <div class="side-label">Your knowledge bases</div>
+      <div class="kb-list" id="kbList"></div>
+
+      <div class="side-footer">
+        <div class="status-row" id="ollamaStatus" title="LLM server">
+          <span class="dot"></span><span class="status-text">Checking Ollama…</span>
+        </div>
+        <div class="status-row muted small" id="embedStatus"></div>
+      </div>
+    </aside>
+
+    <!-- ───────────── Main ───────────── -->
+    <main class="main">
+      <button class="icon-btn menu-btn" id="menuBtn" aria-label="Menu">
+        <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+
+      <!-- Ingest view -->
+      <section class="view" id="ingestView">
+        <div class="hero">
+          <div class="eyebrow"><span class="pulse"></span> Local RAG · Private · Open-source models</div>
+          <h1>Turn any website into a<br /><span class="grad">knowledge base you can chat with</span></h1>
+          <p class="lead">Paste a URL. BrowseAI crawls the site, strips menus, ads and repeated boilerplate,
+            then indexes the real content so you can ask questions and get cited answers.</p>
+
+          <form class="url-form" id="ingestForm" autocomplete="off">
+            <div class="url-input">
+              <svg viewBox="0 0 24 24"><path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>
+              <input id="urlInput" type="text" placeholder="https://docs.example.com" required />
+              <button class="btn btn-primary" id="ingestBtn" type="submit">
+                Build knowledge base
+                <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </button>
+            </div>
+
+            <div class="examples">
+              Try:
+              <button type="button" class="chip" data-url="https://docs.python.org/3/tutorial/" data-same="1">Python tutorial</button>
+              <button type="button" class="chip" data-url="https://fastapi.tiangolo.com/tutorial/" data-same="1">FastAPI docs</button>
+              <button type="button" class="chip" data-url="https://paulgraham.com/articles.html">Paul Graham essays</button>
+            </div>
+
+            <details class="advanced">
+              <summary>
+                <svg viewBox="0 0 24 24"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>
+                Crawl settings
+              </summary>
+              <div class="adv-grid">
+                <label class="field">
+                  <span class="field-head">Max pages <b id="maxPagesVal">25</b></span>
+                  <input type="range" id="maxPages" min="1" max="150" value="25" />
+                  <span class="hint">More pages = better coverage, slower build.</span>
+                </label>
+                <label class="field">
+                  <span class="field-head">Link depth <b id="maxDepthVal">2</b></span>
+                  <input type="range" id="maxDepth" min="0" max="4" value="2" />
+                  <span class="hint">How many clicks away from the start page to follow.</span>
+                </label>
+                <div class="field">
+                  <span class="field-head">JavaScript rendering</span>
+                  <div class="segmented" id="jsMode">
+                    <button type="button" data-v="off">Off</button>
+                    <button type="button" data-v="auto" class="on">Auto</button>
+                    <button type="button" data-v="always">Always</button>
+                  </div>
+                  <span class="hint">Auto renders pages whose HTML is empty (needs Playwright).</span>
+                </div>
+                <label class="field toggle-field">
+                  <span class="field-head">Stay within this path</span>
+                  <span class="toggle"><input type="checkbox" id="samePath" /><span class="slider"></span></span>
+                  <span class="hint">e.g. only crawl under <code>/docs/</code>.</span>
+                </label>
+              </div>
+            </details>
+          </form>
+        </div>
+
+        <!-- How it works (idle) -->
+        <div class="how" id="howItWorks">
+          <div class="how-card"><div class="how-num">1</div><h3>Crawl &amp; extract</h3><p>Follows same-site links, respects robots.txt, reads the sitemap and renders JavaScript pages when needed.</p></div>
+          <div class="how-card"><div class="how-num">2</div><h3>Clean &amp; index</h3><p>Removes navigation, footers and text repeated across pages, splits content by section and embeds it into FAISS.</p></div>
+          <div class="how-card"><div class="how-num">3</div><h3>Ask with citations</h3><p>Retrieves the most relevant passages and a local LLM answers with numbered links back to the source pages.</p></div>
+        </div>
+
+        <!-- Live pipeline (running) -->
+        <div class="pipeline-wrap hidden" id="pipelineWrap">
+          <div class="pipe-head">
+            <div>
+              <div class="pipe-title" id="pipeTitle">Building knowledge base</div>
+              <div class="pipe-url" id="pipeUrl"></div>
+            </div>
+            <div class="pipe-timer" id="pipeTimer">0.0s</div>
+          </div>
+
+          <div class="pipeline" id="pipeline"></div>
+          <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+
+          <div class="stats">
+            <div class="stat"><div class="stat-val" id="stPages">0</div><div class="stat-label">Pages crawled</div></div>
+            <div class="stat"><div class="stat-val" id="stWords">0</div><div class="stat-label">Words kept</div></div>
+            <div class="stat"><div class="stat-val" id="stNoise">0</div><div class="stat-label">Noise blocks removed</div></div>
+            <div class="stat"><div class="stat-val" id="stChunks">0</div><div class="stat-label">Chunks indexed</div></div>
+          </div>
+
+          <div class="feed-head">Live activity</div>
+          <div class="feed" id="feed"></div>
+
+          <div class="pipe-done hidden" id="pipeDone">
+            <div class="done-msg"><span class="check">✓</span> <span id="doneText">Ready</span></div>
+            <button class="btn btn-primary" id="startChatBtn">Start chatting
+              <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+          </div>
+          <div class="pipe-error hidden" id="pipeError"></div>
+        </div>
+      </section>
+
+      <!-- Chat view -->
+      <section class="view hidden" id="chatView">
+        <header class="chat-head">
+          <div class="chat-site">
+            <div class="kb-avatar lg" id="chatAvatar">A</div>
+            <div class="chat-site-text">
+              <div class="chat-title" id="chatTitle">example.com</div>
+              <a class="chat-url" id="chatUrl" target="_blank" rel="noopener"></a>
+            </div>
+          </div>
+          <div class="chat-tools">
+            <span class="pill" id="chatPills"></span>
+            <label class="select-wrap" title="LLM used to write answers">
+              <svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M9 9h6v6H9z"/></svg>
+              <select id="modelSelect"></select>
+            </label>
+            <button class="btn btn-ghost" id="sourcesBtn">
+              <svg viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h10"/></svg> Pages
+            </button>
+            <button class="icon-btn" id="clearChatBtn" title="Clear conversation">
+              <svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>
+            </button>
+          </div>
+        </header>
+
+        <div class="chat-body">
+          <div class="messages" id="messages"></div>
+
+          <aside class="pages-panel hidden" id="pagesPanel">
+            <div class="panel-head">
+              <span>Indexed pages</span>
+              <button class="icon-btn" id="closePanelBtn"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+            </div>
+            <input class="panel-search" id="pageFilter" placeholder="Filter pages…" />
+            <div class="panel-list" id="pagesList"></div>
+          </aside>
+        </div>
+
+        <form class="composer" id="chatForm">
+          <div class="composer-box">
+            <textarea id="chatInput" rows="1" placeholder="Ask anything about this website…"></textarea>
+            <button class="send-btn" id="sendBtn" type="submit" aria-label="Send">
+              <svg class="i-send" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              <svg class="i-stop" viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="2"/></svg>
+            </button>
+          </div>
+          <div class="composer-hint">Answers are grounded in the indexed pages · <kbd>Enter</kbd> to send · <kbd>Shift</kbd>+<kbd>Enter</kbd> for a new line</div>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="/static/app.js"></script>
+</body>
+</html>

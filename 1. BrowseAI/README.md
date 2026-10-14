@@ -3,6 +3,9 @@
 Paste a URL and BrowseAI turns the whole website into a searchable knowledge base.
 Then ask it questions and get answers that cite the pages they came from.
 
+<img width="1267" height="684" alt="image" src="https://github.com/user-attachments/assets/72eb706e-df73-4b30-9752-70eb4b97ade1" />
+
+
 Everything runs locally: open-source embeddings (sentence-transformers), a FAISS vector
 index, and an open-source LLM served by [Ollama](https://ollama.com).
 

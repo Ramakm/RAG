@@ -30,8 +30,6 @@ function saveStore(key, value) {
 }
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const fmt = (n) => Number(n || 0).toLocaleString();
-function hue(str) { let h = 0; for (const c of str) h = (h * 31 + c.charCodeAt(0)) % 360; return h; }
-function avatarStyle(name) { const h = hue(name); return `background: linear-gradient(135deg, hsl(${h} 75% 55%), hsl(${(h + 50) % 360} 80% 50%))`; }
 function shortUrl(u) { try { const x = new URL(u); return x.pathname === "/" ? x.host : x.pathname + x.search; } catch { return u; } }
 function toast(msg) {
   const t = $("#toast"); t.textContent = msg; t.classList.add("show");
@@ -119,7 +117,7 @@ function renderKbList() {
   }
   list.innerHTML = state.kbs.map((kb) => `
     <div class="kb-item ${state.kb?.id === kb.id ? "active" : ""}" data-id="${esc(kb.id)}">
-      <div class="kb-avatar" style="${avatarStyle(kb.name)}">${esc(kb.name[0] || "?")}</div>
+      <div class="kb-avatar">${esc(kb.name[0] || "?")}</div>
       <div class="kb-meta">
         <div class="kb-name">${esc(kb.name)}</div>
         <div class="kb-sub">${fmt(kb.page_count)} pages · ${fmt(kb.chunk_count)} chunks</div>
@@ -169,7 +167,6 @@ async function openKb(id) {
   $("#sidebar").classList.remove("open");
   const kb = state.kb;
   $("#chatAvatar").textContent = kb.name[0] || "?";
-  $("#chatAvatar").setAttribute("style", avatarStyle(kb.name));
   $("#chatTitle").textContent = kb.name;
   $("#chatUrl").textContent = kb.url; $("#chatUrl").href = kb.url;
   $("#chatPills").textContent = `${fmt(kb.page_count)} pages · ${fmt(kb.chunk_count)} chunks · ${fmt(kb.word_count)} words`;
@@ -364,7 +361,7 @@ function renderMessages() {
   if (!msgs.length) {
     box.innerHTML = `
       <div class="empty">
-        <div class="kb-avatar" style="${avatarStyle(kb.name)}">${esc(kb.name[0] || "?")}</div>
+        <div class="kb-avatar">${esc(kb.name[0] || "?")}</div>
         <h2>Ask ${esc(kb.name)} anything</h2>
         <p>${fmt(kb.page_count)} pages indexed. Answers cite the exact pages they came from.</p>
         <div class="suggestions">

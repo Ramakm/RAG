@@ -124,7 +124,7 @@ def parse_docx(path: Path, assets: Path, fid: str) -> dict:
         if "image" in rel.reltype and len(images) < MAX_FIGURES:
             dest = _save_figure(rel.target_part.blob, assets / f"{fid}-fig{len(images)}.jpg", seen)
             if dest:
-                images.append({"path": dest, "loc": "Figure", "page": None})
+                images.append({"path": dest, "loc": "", "page": None})
     return {"sections": [{"loc": "", "page": None, "text": "\n\n".join(lines), "asset": None}],
             "images": images, "ocr": [], "info": {}}
 

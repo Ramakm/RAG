@@ -12,6 +12,8 @@
 ![FAISS](https://img.shields.io/badge/FAISS-0467DF?style=flat-square&logo=meta&logoColor=white)
 ![Sentence Transformers](https://img.shields.io/badge/Sentence--Transformers-FFD21E?style=flat-square&logo=huggingface&logoColor=black)
 ![Playwright](https://img.shields.io/badge/Playwright-2EAD33?style=flat-square)
+![Whisper](https://img.shields.io/badge/Whisper-000000?style=flat-square&logo=openai&logoColor=white)
+![CLIP](https://img.shields.io/badge/CLIP-000000?style=flat-square)
 ![Llama](https://img.shields.io/badge/Llama_3.2-0467DF?style=flat-square&logo=meta&logoColor=white)
 
 ![Stars](https://img.shields.io/github/stars/Ramakm/RAG?style=flat-square)
@@ -38,6 +40,7 @@ grounded generation**, with a usable UI on top.
 | # | Project | What it does | Stack |
 |:-:|---|---|---|
 | 1 | [**BrowseAI**](./1.%20BrowseAI) | Turns any website URL into a searchable knowledge base you can chat with. Answers cite their source pages. | FastAPI · trafilatura · sentence-transformers · FAISS · Ollama |
+| 2 | [**OmniRAG**](./2.%20OmniRAG) | Multimodal RAG over documents, images, audio and video. Ask in text or with an image; answers cite pages, pictures and timestamps. | FastAPI · PyMuPDF · Whisper · CLIP · Tesseract · FAISS · Ollama |
 
 > More projects coming soon.
 
@@ -57,6 +60,24 @@ cd "1. BrowseAI" && ./run.sh        # → http://localhost:8000
 ```
 
 [Read the full BrowseAI docs →](./1.%20BrowseAI/README.md)
+
+### 2. OmniRAG — Multimodal RAG
+
+Drop in PDFs, slides, photos, recordings and videos. OmniRAG parses documents and their figures,
+OCRs scans and screenshots, transcribes speech with Whisper and embeds images and video frames with
+CLIP. One search spans everything, so you can ask with text or attach an image. Answers cite the
+exact page, picture or timestamp, and media sources play from the cited moment.
+
+```
+Files ─► Parse ─► Transcribe ─► Vision (CLIP · OCR · captions) ─► Embed ─► 2× FAISS ─► Fused retrieval ─► Ollama ─► Cited answer
+```
+
+```bash
+ollama serve && ollama pull llama3.2      # optional: ollama pull moondream
+cd "2. OmniRAG" && ./run.sh               # → http://localhost:8001
+```
+
+[Read the full OmniRAG docs →](./2.%20OmniRAG/README.md)
 
 ## Getting started
 

@@ -31,6 +31,7 @@ colls = CollectionManager()
 jobs: dict[str, Job] = {}
 _tasks: set[asyncio.Task] = set()
 KB_ID = re.compile(r"^[a-z0-9-]{1,80}$")
+FOLLOW_UP = re.compile(r"^(and|or|but|also|so|then|what about|how about|why|more)\b|\b(it|its|they|them|their|that|this|those|these|he|she|his|her|there)\b", re.I)
 
 
 def sse(event: str, data) -> str:
@@ -206,10 +207,11 @@ async def chat(kb_id: str, req: ChatRequest):
     model = req.model if req.model in status["models"] else status["default"]
     can_see = bool(model and model in status["vision_models"])
 
-    # Short follow-ups ("and the price?") are retrieved together with the previous question.
+    # Short follow-ups that lean on the previous turn ("and the price?", "who made it?") are
+    # retrieved together with the previous question; standalone questions are searched as-is.
     query = req.question.strip()
     prev_q = next((t["content"] for t in reversed(req.history) if t.get("role") == "user"), "")
-    if prev_q and query and len(query.split()) < 8:
+    if prev_q and query and len(query.split()) < 8 and FOLLOW_UP.search(query):
         query = f"{prev_q} {query}"
 
     async def gen():

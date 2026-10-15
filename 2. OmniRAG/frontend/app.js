@@ -774,7 +774,7 @@ function fileDetail(f) {
   if (f.modality === "document") {
     if (i.pages) bits.push(`${i.pages} page${i.pages > 1 ? "s" : ""}`);
     if (i.slides) bits.push(`${i.slides} slide${i.slides > 1 ? "s" : ""}`);
-    if (i.figures) bits.push(`${i.figures} figures`);
+    if (i.figures) bits.push(`${i.figures} figure${i.figures > 1 ? "s" : ""}`);
     if (i.scanned_pages) bits.push(`${i.scanned_pages} scanned`);
   } else if (f.modality === "image") {
     if (i.width) bits.push(`${i.width}×${i.height}`);
@@ -783,7 +783,7 @@ function fileDetail(f) {
     if (i.words) bits.push(`${fmt(i.words)} words`);
     if (i.frames_sampled) bits.push(`${i.frames_sampled} frames`);
   }
-  bits.push(`${fmt(f.items)} items`, bytes(f.size));
+  bits.push(`${fmt(f.items)} item${f.items === 1 ? "" : "s"}`, bytes(f.size));
   return bits.join(" · ");
 }
 

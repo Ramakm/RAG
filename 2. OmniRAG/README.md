@@ -8,6 +8,9 @@ or play each source right in the chat.
 Everything runs locally: Whisper for speech, CLIP for images, MiniLM for text, FAISS for search
 and an open-source LLM served by [Ollama](https://ollama.com).
 
+<img width="1162" height="670" alt="Screenshot 2026-10-15 at 5 33 08 PM" src="https://github.com/user-attachments/assets/c10883ae-b02a-442a-a9e5-32308ce96ffc" />
+
+
 ```
                  ┌────────────────────────── INGESTION PIPELINE ──────────────────────────┐
   PDF/DOCX/PPTX ─┤ Parse ── text by page/slide · embedded figures · scanned pages ──┐     │

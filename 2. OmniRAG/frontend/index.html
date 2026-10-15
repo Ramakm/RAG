@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OmniRAG — Chat with documents, images, audio and video</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='black'/><rect x='8' y='8' width='7' height='7' rx='1.5' fill='white'/><circle cx='20.5' cy='11.5' r='3.5' fill='none' stroke='white' stroke-width='2'/><path d='M8 24l3.5-5 3.5 5z' fill='white'/><path d='M18 18.5v6l5-3z' fill='white'/></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <div class="app">
+    <!-- ───────────── Sidebar ───────────── -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="logo">
+          <svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><circle cx="17" cy="7" r="3.5"/><path d="M3.5 20.5l3.5-6 3.5 6z"/><path d="M14.5 14v6.5l5.5-3.25z"/></svg>
+        </div>
+        <div>
+          <div class="brand-name">OmniRAG</div>
+          <div class="brand-sub">Multimodal knowledge chat</div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-block" id="newKbBtn">
+        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+        New collection
+      </button>
+
+      <div class="side-label">Your collections</div>
+      <div class="kb-list" id="kbList"></div>
+
+      <div class="side-footer">
+        <div class="status-row" id="ollamaStatus" title="LLM server">
+          <span class="dot"></span><span class="status-text">Checking Ollama…</span>
+        </div>
+        <div class="status-row" id="visionStatus"><span class="dot"></span><span class="status-text">Vision model</span></div>
+        <div class="status-row" id="ocrStatus"><span class="dot"></span><span class="status-text">OCR</span></div>
+        <div class="status-row muted small" id="embedStatus"></div>
+      </div>
+    </aside>
+
+    <!-- ───────────── Main ───────────── -->
+    <main class="main">
+      <button class="icon-btn menu-btn" id="menuBtn" aria-label="Menu">
+        <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+
+      <!-- Ingest view -->
+      <section class="view" id="ingestView">
+        <div class="hero">
+          <div class="eyebrow"><span class="pulse"></span> Local multimodal RAG · Documents · Images · Audio · Video</div>
+          <h1 id="heroTitle">Ask questions across your<br />documents, images, audio and video</h1>
+          <p class="lead" id="heroLead">Drop in PDFs, slides, photos, recordings or videos. OmniRAG reads the text, looks at the images,
+            transcribes the speech and indexes all of it, so you get answers that cite the exact page, picture or timestamp.</p>
+
+          <div class="adding hidden" id="addingBanner">
+            <span>Adding files to <b id="addingName"></b></span>
+            <button type="button" class="btn btn-ghost" id="cancelAddBtn">Cancel</button>
+          </div>
+
+          <form class="url-form" id="ingestForm" autocomplete="off">
+            <label class="dropzone" id="dropzone">
+              <input type="file" id="fileInput" multiple hidden />
+              <svg viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
+              <div class="dz-title">Drop files here or <u>browse</u></div>
+              <div class="dz-types">
+                <span class="mtag" data-m="document">PDF · DOCX · PPTX · TXT · MD · CSV</span>
+                <span class="mtag" data-m="image">PNG · JPG · WEBP</span>
+                <span class="mtag" data-m="audio">MP3 · WAV · M4A</span>
+                <span class="mtag" data-m="video">MP4 · MOV · WEBM</span>
+              </div>
+            </label>
+
+            <div class="queue hidden" id="queue">
+              <div class="queue-list" id="queueList"></div>
+              <div class="queue-foot">
+                <input class="name-input" id="nameInput" placeholder="Collection name (optional)" maxlength="80" />
+                <span class="queue-sum muted" id="queueSum"></span>
+                <button class="btn btn-primary" id="ingestBtn" type="submit">
+                  <span id="ingestBtnText">Build collection</span>
+                  <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <details class="advanced">
+              <summary>
+                <svg viewBox="0 0 24 24"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>
+                Processing settings
+              </summary>
+              <div class="adv-grid">
+                <div class="field">
+                  <span class="field-head">Speech-to-text model</span>
+                  <div class="segmented" id="whisperMode">
+                    <button type="button" data-v="tiny">Tiny</button>
+                    <button type="button" data-v="base" class="on">Base</button>
+                    <button type="button" data-v="small">Small</button>
+                  </div>
+                  <span class="hint">Whisper size. Larger is more accurate but slower.</span>
+                </div>
+                <label class="field">
+                  <span class="field-head">Video frame every <b id="frameVal">15s</b></span>
+                  <input type="range" id="frameInterval" min="3" max="60" value="15" />
+                  <span class="hint">Frames are searchable by what they show. Duplicates are dropped.</span>
+                </label>
+                <label class="field toggle-field">
+                  <span class="field-head">Read text in images (OCR)</span>
+                  <span class="toggle"><input type="checkbox" id="ocrToggle" checked /><span class="slider"></span></span>
+                  <span class="hint" id="ocrHint">Screenshots, slides, scanned pages.</span>
+                </label>
+                <label class="field toggle-field">
+                  <span class="field-head">Describe images with a vision model</span>
+                  <span class="toggle"><input type="checkbox" id="captionToggle" checked /><span class="slider"></span></span>
+                  <span class="hint" id="captionHint">Uses a local vision model in Ollama.</span>
+                </label>
+              </div>
+            </details>
+          </form>
+        </div>
+
+        <!-- How it works (idle) -->
+        <div class="how" id="howItWorks">
+          <div class="how-card"><div class="how-num">1</div><h3>Parse every format</h3><p>Pulls text by page and slide, extracts embedded figures, OCRs scans and screenshots, and strips repeated headers and footers.</p></div>
+          <div class="how-card"><div class="how-num">2</div><h3>See and listen</h3><p>Whisper transcribes speech with timestamps. Video frames and images get CLIP embeddings, so you can search them by what they show.</p></div>
+          <div class="how-card"><div class="how-num">3</div><h3>Ask in any modality</h3><p>Ask with text or attach an image. Answers cite pages, pictures and timestamps you can open or play.</p></div>
+        </div>
+
+        <!-- Live pipeline (running) -->
+        <div class="pipeline-wrap hidden" id="pipelineWrap">
+          <div class="pipe-head">
+            <div>
+              <div class="pipe-title" id="pipeTitle">Building collection</div>
+              <div class="pipe-url" id="pipeUrl"></div>
+            </div>
+            <div class="pipe-timer" id="pipeTimer">0.0s</div>
+          </div>
+
+          <div class="pipeline" id="pipeline"></div>
+          <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+
+          <div class="stats">
+            <div class="stat"><div class="stat-val" id="stFiles">0</div><div class="stat-label">Files processed</div></div>
+            <div class="stat"><div class="stat-val" id="stChunks">0</div><div class="stat-label">Text chunks</div></div>
+            <div class="stat"><div class="stat-val" id="stVisuals">0</div><div class="stat-label">Visuals indexed</div></div>
+            <div class="stat"><div class="stat-val" id="stMedia">00:00</div><div class="stat-label">Media transcribed</div></div>
+          </div>
+
+          <div class="feed-head">Live activity</div>
+          <div class="feed" id="feed"></div>
+
+          <div class="pipe-done hidden" id="pipeDone">
+            <div class="done-msg"><span class="check">✓</span> <span id="doneText">Ready</span></div>
+            <button class="btn btn-primary" id="startChatBtn">Start chatting
+              <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+          </div>
+          <div class="pipe-error hidden" id="pipeError"></div>
+        </div>
+      </section>
+
+      <!-- Chat view -->
+      <section class="view hidden" id="chatView">
+        <header class="chat-head">
+          <div class="chat-site">
+            <div class="kb-avatar lg" id="chatAvatar">A</div>
+            <div class="chat-site-text">
+              <div class="chat-title" id="chatTitle">Collection</div>
+              <div class="chat-url" id="chatSub" style="font-family: inherit"></div>
+            </div>
+          </div>
+          <div class="chat-tools">
+            <span class="pill" id="chatPills"></span>
+            <label class="select-wrap" title="LLM used to write answers">
+              <svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M9 9h6v6H9z"/></svg>
+              <select id="modelSelect"></select>
+            </label>
+            <button class="btn btn-ghost" id="addFilesBtn">
+              <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Add files
+            </button>
+            <button class="btn btn-ghost" id="sourcesBtn">
+              <svg viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h10"/></svg> Files
+            </button>
+            <button class="icon-btn" id="clearChatBtn" title="Clear conversation">
+              <svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>
+            </button>
+          </div>
+        </header>
+
+        <div class="chat-body">
+          <div class="messages" id="messages"></div>
+
+          <aside class="pages-panel hidden" id="pagesPanel">
+            <div class="panel-head">
+              <span>Files in collection</span>
+              <button class="icon-btn" id="closePanelBtn"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+            </div>
+            <input class="panel-search" id="pageFilter" placeholder="Filter files…" />
+            <div class="panel-list" id="pagesList"></div>
+          </aside>
+        </div>
+
+        <form class="composer" id="chatForm">
+          <div class="composer-box" id="composerBox">
+            <div class="attach-preview hidden" id="attachPreview">
+              <img id="attachImg" alt="Attached image" />
+              <button type="button" class="attach-x" id="attachRemove" aria-label="Remove image">×</button>
+            </div>
+            <div class="composer-row">
+              <button type="button" class="icon-btn attach-btn" id="attachBtn" title="Ask with an image">
+                <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg>
+              </button>
+              <input type="file" id="attachInput" accept="image/*" hidden />
+              <textarea id="chatInput" rows="1" placeholder="Ask about your files, or attach an image…"></textarea>
+              <button class="send-btn" id="sendBtn" type="submit" aria-label="Send">
+                <svg class="i-send" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                <svg class="i-stop" viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="2"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="composer-hint">Answers are grounded in your files · paste or drop an image to search by picture · <kbd>Enter</kbd> to send</div>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <div class="lightbox hidden" id="lightbox">
+    <button class="icon-btn lb-close" id="lbClose" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <div class="lb-body" id="lbBody"></div>
+    <div class="lb-cap" id="lbCap"></div>
+  </div>
+  <div class="toast" id="toast"></div>
+  <script src="/static/app.js"></script>
+</body>
+</html>

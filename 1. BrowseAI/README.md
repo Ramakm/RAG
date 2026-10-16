@@ -9,17 +9,8 @@ Then ask it questions and get answers that cite the pages they came from.
 Everything runs locally: open-source embeddings (sentence-transformers), a FAISS vector
 index, and an open-source LLM served by [Ollama](https://ollama.com).
 
-```
-                         ┌──────────────────── INGESTION PIPELINE ────────────────────┐
-  https://site.com  ──►  │ Crawl ─► Extract ─► Clean ─► Chunk ─► Embed ─► Index       │
-                         │ httpx    trafilatura  cross-page  heading-  MiniLM   FAISS   │
-                         │ (+JS)    + bs4        dedupe      aware     384-d    (disk)  │
-                         └────────────────────────────────────────────────────────────┘
-                                                                              │
-  "How do I…?"  ──►  embed query ─► hybrid search (dense + keyword) ─► top-k chunks
-                                                                              │
-                     cited answer  ◄── Ollama LLM (streamed) ◄── prompt + context
-```
+<img width="1983" height="793" alt="image" src="https://github.com/user-attachments/assets/217f35b8-7070-44bd-98cf-c006519eb975" />
+
 
 ## Quick start
 

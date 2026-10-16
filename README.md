@@ -50,9 +50,8 @@ Paste a URL. BrowseAI crawls the site, strips navigation, footers and repeated b
 renders JavaScript pages when needed, then indexes the real content. You get streaming answers
 with clickable citations back to the exact passages they came from.
 
-```
-URL ─► Crawl ─► Extract ─► Clean ─► Chunk ─► Embed ─► FAISS ─► Retrieve ─► Ollama ─► Cited answer
-```
+<img width="1983" height="793" alt="image" src="https://github.com/user-attachments/assets/85a8fced-7b39-46f3-b8b7-339d3fb088d2" />
+
 
 ```bash
 ollama serve && ollama pull llama3.2
@@ -68,9 +67,8 @@ OCRs scans and screenshots, transcribes speech with Whisper and embeds images an
 CLIP. One search spans everything, so you can ask with text or attach an image. Answers cite the
 exact page, picture or timestamp, and media sources play from the cited moment.
 
-```
-Files ─► Parse ─► Transcribe ─► Vision (CLIP · OCR · captions) ─► Embed ─► 2× FAISS ─► Fused retrieval ─► Ollama ─► Cited answer
-```
+<img width="1983" height="793" alt="Multimodal RAG Pipeline Architecture" src="https://github.com/user-attachments/assets/a040877e-8908-4981-a3a1-6895de6d78dd" />
+
 
 ```bash
 ollama serve && ollama pull llama3.2      # optional: ollama pull moondream

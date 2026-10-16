@@ -5,26 +5,14 @@ transcribes the speech and indexes all of it in one collection. Ask a question i
 image, and get answers that cite the exact **page**, **picture** or **timestamp**. You can open
 or play each source right in the chat.
 
+<img width="1162" height="670" alt="Screenshot 2026-10-15 at 5 33 08 PM" src="https://github.com/user-attachments/assets/c10883ae-b02a-442a-a9e5-32308ce96ffc" />
+
 Everything runs locally: Whisper for speech, CLIP for images, MiniLM for text, FAISS for search
 and an open-source LLM served by [Ollama](https://ollama.com).
 
-<img width="1162" height="670" alt="Screenshot 2026-10-15 at 5 33 08 PM" src="https://github.com/user-attachments/assets/c10883ae-b02a-442a-a9e5-32308ce96ffc" />
 
+<img width="1983" height="793" alt="image" src="https://github.com/user-attachments/assets/4795cfce-c53c-4576-9b24-740dee9ce8eb" />
 
-```
-                 ┌────────────────────────── INGESTION PIPELINE ──────────────────────────┐
-  PDF/DOCX/PPTX ─┤ Parse ── text by page/slide · embedded figures · scanned pages ──┐     │
-  PNG/JPG       ─┤ Vision ─ CLIP embedding · OCR · vision-model caption (optional) ──┼─► Embed ─► FAISS
-  MP3/WAV/M4A   ─┤ Transcribe ─ Whisper + VAD → timestamped transcript windows ──────┤  MiniLM   text index
-  MP4/MOV/WEBM  ─┤ Transcribe + sample frames → CLIP, near-duplicate frames dropped ─┘  CLIP     visual index
-                 └────────────────────────────────────────────────────────────────────────┘
-                                                                                     │
-  "What did they decide?"  ─► text search (MiniLM) ─┐                                 │
-  "the revenue chart"      ─► text→image (CLIP)    ─┼─► calibrated fusion ─► top-k mixed sources
-  [attached image]         ─► image→image (CLIP)   ─┘                                 │
-                                                                                     ▼
-                    cited answer ◄── Ollama LLM (streamed; vision models also see the images)
-```
 
 ## Quick start
 

@@ -4,9 +4,8 @@ Ask questions in plain English across QC reports, supplier specs, manuals, servi
 
 Design rationale, prompts, evaluation plan and roadmap: [DESIGN.md](DESIGN.md).
 
-```
-question -> planner -> retrieve (vector | SQL) -> grader -> [rewriter -> retrieve]* -> generator -> groundedness check -> answer + sources
-```
+<img width="1983" height="793" alt="image" src="https://github.com/user-attachments/assets/194268e2-b0e9-472f-bf9d-757068c7bfe4" />
+
 
 ## Quick start
 

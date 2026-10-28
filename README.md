@@ -31,7 +31,7 @@ Most RAG tutorials stop at "upload a PDF". These projects go further. Each one i
 working application covering **ingestion → cleaning → chunking → embeddings → vector search →
 grounded generation**, with a usable UI on top.
 
-- **Local first:** open-source embeddings and LLMs via Ollama. No API keys, and your data stays on your machine.
+- **Local first:** open-source embeddings and LLMs via Ollama. No API keys, and your data stays on your machine (Agentic RAG is the exception and uses an Anthropic API key).
 - **Production-minded:** they tackle the messy real-world parts, not just the happy path.
 - **Self-contained:** every project lives in its own folder with its own README and a one-command launcher.
 
@@ -41,6 +41,7 @@ grounded generation**, with a usable UI on top.
 |:-:|---|---|---|
 | 1 | [**BrowseAI**](./1.%20BrowseAI) | Turns any website URL into a searchable knowledge base you can chat with. Answers cite their source pages. | FastAPI · trafilatura · sentence-transformers · FAISS · Ollama |
 | 2 | [**OmniRAG**](./2.%20OmniRAG) | Multimodal RAG over documents, images, audio and video. Ask in text or with an image; answers cite pages, pictures and timestamps. | FastAPI · PyMuPDF · Whisper · CLIP · Tesseract · FAISS · Ollama |
+| 3 | [**Agentic RAG**](./3.%20Agentic%20RAG) | A LangGraph agent that plans, retrieves from vector search and/or guarded SQL, grades evidence, retries weak queries and fact-checks its cited answers. | LangGraph · Chroma · FastAPI · Streamlit · sqlglot · Claude |
 | 📚 | [**RAG Fundamentals**](./RAG%20Fundamentals) | 39 notebooks that walk through RAG techniques, from a simple baseline to GraphRAG, Self-RAG and evaluation. | Jupyter · sentence-transformers · rank_bm25 · networkx · Ollama |
 
 > More projects coming soon.
@@ -77,6 +78,22 @@ cd "2. OmniRAG" && ./run.sh               # → http://localhost:8001
 ```
 
 [Read the full OmniRAG docs →](./2.%20OmniRAG/README.md)
+
+### 3. Agentic RAG — Plan, Retrieve, Verify
+
+Ask questions in plain English across reports, specs, manuals, tickets **and** a sales/returns
+database. A LangGraph agent plans the query, picks vector search and/or guarded SQL, grades the
+evidence, rewrites weak queries (up to 3 retries), writes a cited answer and fact-checks it against
+the sources. SQL runs through an allowlist guard with a forced `LIMIT`, a read-only connection and a timeout.
+
+```bash
+cd "3. Agentic RAG"
+python -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
+cp .env.example .env              # add your ANTHROPIC_API_KEY
+make demo && make ui              # → http://localhost:8501
+```
+
+[Read the full Agentic RAG docs →](./3.%20Agentic%20RAG/README.md)
 
 ### 📚 RAG Fundamentals — 39 Techniques, One Notebook Each
 

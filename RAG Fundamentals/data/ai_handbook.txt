@@ -1,0 +1,57 @@
+# The Applied AI Handbook
+
+## Introduction to RAG
+
+Retrieval-Augmented Generation (RAG) combines a retriever with a language model. Instead of relying only on what the model memorised during training, the system first searches an external knowledge base and then passes the retrieved passages to the model as context. This keeps answers grounded in up-to-date, private or domain-specific data without retraining the model. A basic RAG pipeline has four stages: ingest documents, split them into chunks, index the chunks as embeddings, and at query time retrieve the closest chunks and generate an answer from them.
+
+## Embeddings
+
+An embedding model maps text to a dense vector so that texts with similar meaning land close together. The all-MiniLM-L6-v2 model produces 384-dimensional vectors and is popular for local experiments because it is small and fast. Similarity between two vectors is usually measured with cosine similarity, which compares direction rather than length. If the vectors are normalised to unit length, cosine similarity equals the dot product, which makes search cheaper. Embedding models are trained with contrastive learning, pulling matching pairs together and pushing random pairs apart.
+
+## Vector Databases
+
+A vector database stores embeddings and answers nearest-neighbour queries quickly. Exact search compares the query with every vector, which is accurate but slow at scale. Approximate nearest neighbour indexes such as HNSW and IVF trade a little recall for large speed gains. HNSW builds a layered graph where upper layers provide long jumps and lower layers refine the result. FAISS is a library for in-process vector search, while Milvus, Qdrant and Weaviate run as separate database services with filtering, persistence and replication.
+
+## Chunking Strategies
+
+Documents must be split before indexing because embedding a whole book into one vector blurs its meaning. Fixed-size chunking cuts text every N characters with some overlap, and it is the simplest baseline. Semantic chunking places boundaries where the topic shifts, detected by comparing the embeddings of neighbouring sentences. Small chunks give precise matches but may lose context, while large chunks keep context but dilute the embedding. A chunk size of around 500 to 1000 characters with 10 to 20 percent overlap is a common starting point that should be tuned on real questions.
+
+## Hybrid Search and BM25
+
+BM25 is a lexical ranking function that scores documents by how often query terms appear, weighted by how rare each term is across the collection. It is excellent at exact keywords, product codes and names that embeddings often miss. Dense retrieval is better at paraphrases and meaning. Hybrid search runs both and merges the rankings, either with a weighted score or with Reciprocal Rank Fusion, which adds 1 divided by (60 plus rank) for every list in which a document appears. Hybrid retrieval is one of the most reliable ways to improve recall in production.
+
+## Reranking
+
+A first-stage retriever is fast but coarse. A reranker is a cross-encoder that reads the query and a candidate passage together and outputs a relevance score, which is far more accurate than comparing two independent vectors. Because cross-encoders are slow, they are applied only to the top 20 to 50 candidates, and the best 3 to 5 are sent to the language model. The model cross-encoder/ms-marco-MiniLM-L-6-v2 is a small, widely used reranker. Reranking usually gives a large boost in precision for a modest latency cost.
+
+## Query Transformation
+
+User questions are often vague, short or badly phrased, so the query is rewritten before retrieval. Query rewriting turns a conversational question into a standalone search query. Step-back prompting asks a more general question first to fetch broader background. Sub-query decomposition splits a complex question into several simple ones that are retrieved separately. HyDE, or Hypothetical Document Embedding, asks the language model to write a fake answer and then searches with the embedding of that answer, because an answer looks more like a document than a question does.
+
+## Evaluating RAG Systems
+
+A RAG system has two parts to evaluate: retrieval and generation. Retrieval is measured with hit rate, recall at k and mean reciprocal rank, which averages 1 divided by the rank of the first correct result. Generation is measured with faithfulness, which checks that every claim is supported by the context, and answer relevancy, which checks that the answer addresses the question. An LLM acting as a judge can score these automatically, but the judge itself must be validated against human labels. Build a small golden set of questions with known answers before changing anything.
+
+## Hallucinations and Grounding
+
+A hallucination is a fluent statement that is not supported by the source material. RAG reduces hallucinations but does not remove them, because the model can ignore the context or over-generalise from it. Grounding techniques include instructing the model to answer only from the context, requiring citations for each claim, and running a second verification pass that checks the answer against the retrieved text. When the retrieved context does not contain the answer, the system should say that it does not know instead of guessing.
+
+## Knowledge Graphs and GraphRAG
+
+A knowledge graph stores facts as triples of subject, relation and object, such as Marie Curie, discovered, Polonium. GraphRAG uses a language model to extract entities and relations from documents, builds a graph and answers questions by walking the graph. Microsoft's GraphRAG also detects communities of closely connected entities with the Leiden algorithm and writes a summary for each community, which lets the system answer global questions such as what the main themes of a corpus are. Plain vector search struggles with such questions because no single chunk contains the answer.
+
+## Agents and Agentic RAG
+
+In agentic RAG a language model decides how to retrieve instead of following a fixed pipeline. The agent can choose which tool to call, rewrite its query, retrieve several times, and check whether it has enough evidence before answering. Corrective RAG grades the retrieved documents and falls back to web search when they are irrelevant. Self-RAG trains the model to emit reflection tokens that decide whether retrieval is needed and whether the output is supported. Agents are more flexible but cost more tokens and are harder to debug than fixed pipelines.
+
+## Fine-tuning versus RAG
+
+Fine-tuning changes the weights of a model and is best for teaching style, format or skills. RAG supplies knowledge at query time and is best for facts that change or must be traceable to a source. Updating a RAG system is as simple as re-indexing a document, whereas updating a fine-tuned model requires another training run. Many production systems combine both, using a lightly fine-tuned model that is good at following instructions together with a retriever that provides fresh facts.
+
+## Caching and Latency
+
+Latency in a RAG system comes from embedding the query, searching the index, optionally reranking and finally generating the answer, with generation usually the slowest step. Semantic caching stores previous answers and returns them when a new query has an embedding very close to an old one, for example above a cosine similarity of 0.95. Streaming the answer token by token makes the system feel faster. Using a smaller model for query rewriting and a larger one only for the final answer reduces both cost and delay.
+
+## Security and Privacy
+
+Retrieved text is untrusted input. A malicious document can contain instructions that try to hijack the model, which is called indirect prompt injection. Mitigations include separating instructions from context, filtering retrieved text, and limiting what tools the model may call. Access control must be enforced at retrieval time so that users only see chunks they are allowed to read, using metadata filters on user or group identifiers. Running models locally with a tool such as Ollama keeps sensitive documents on the user's own machine.

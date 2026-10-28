@@ -1,0 +1,18 @@
+{
+  "company": "Nimbus Robotics",
+  "founded": 2015,
+  "headquarters": {"city": "Pune", "country": "India"},
+  "mission": "Build affordable warehouse robots that work safely beside people.",
+  "leadership": [
+    {"name": "Asha Verma", "role": "CEO", "joined": 2015},
+    {"name": "Daniel Okoye", "role": "CTO", "joined": 2016}
+  ],
+  "products": [
+    {"name": "Carrier-1", "type": "autonomous mobile robot", "payload_kg": 150, "battery_hours": 10, "price_usd": 18000},
+    {"name": "Picker-2", "type": "robotic arm picker", "payload_kg": 8, "battery_hours": 12, "price_usd": 26000}
+  ],
+  "policies": {
+    "warranty_years": 2,
+    "support": {"hours": "24/7", "channels": ["phone", "email", "chat"]}
+  }
+}

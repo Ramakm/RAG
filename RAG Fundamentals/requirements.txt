@@ -1,0 +1,18 @@
+# core (every notebook)
+numpy
+sentence-transformers
+ollama
+pandas
+matplotlib
+jupyter
+ipython
+
+# per-notebook extras
+rank_bm25            # 17 fusion_retrieval
+scikit-learn         # 34 raptor
+networkx             # 29-33 graph notebooks
+pymilvus             # 30 graphrag_with_milvus_vectordb
+duckduckgo-search    # 27 crag
+deepeval             # 7 evaluation_deep_eval
+colpali-engine       # 23 multi_model_rag_with_colpali (also needs torch, pillow)
+# open-rag-eval      # 39 optional, full Vectara framework

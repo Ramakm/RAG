@@ -1,0 +1,12 @@
+[
+  {"question": "How many dimensions does the all-MiniLM-L6-v2 embedding model produce?", "answer": "384 dimensions", "evidence": "384-dimensional vectors"},
+  {"question": "What constant is used in the Reciprocal Rank Fusion formula?", "answer": "60", "evidence": "1 divided by (60 plus rank)"},
+  {"question": "Which reranker model is described as small and widely used?", "answer": "cross-encoder/ms-marco-MiniLM-L-6-v2", "evidence": "cross-encoder/ms-marco-MiniLM-L-6-v2 is a small"},
+  {"question": "What does HyDE stand for and how does it work?", "answer": "Hypothetical Document Embedding; the LLM writes a fake answer and the system searches with its embedding.", "evidence": "write a fake answer"},
+  {"question": "What is mean reciprocal rank?", "answer": "The average of 1 divided by the rank of the first correct result.", "evidence": "1 divided by the rank of the first correct result"},
+  {"question": "Which algorithm does Microsoft GraphRAG use to detect communities?", "answer": "The Leiden algorithm", "evidence": "Leiden algorithm"},
+  {"question": "What similarity threshold is suggested for a semantic cache?", "answer": "A cosine similarity above 0.95", "evidence": "above a cosine similarity of 0.95"},
+  {"question": "What is indirect prompt injection?", "answer": "A malicious document contains instructions that try to hijack the model.", "evidence": "indirect prompt injection"},
+  {"question": "What chunk size and overlap are a common starting point?", "answer": "About 500 to 1000 characters with 10 to 20 percent overlap.", "evidence": "500 to 1000 characters with 10 to 20 percent overlap"},
+  {"question": "How many candidates are typically passed to a cross-encoder reranker?", "answer": "The top 20 to 50 candidates.", "evidence": "top 20 to 50 candidates"}
+]

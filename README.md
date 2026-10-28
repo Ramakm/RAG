@@ -41,6 +41,7 @@ grounded generation**, with a usable UI on top.
 |:-:|---|---|---|
 | 1 | [**BrowseAI**](./1.%20BrowseAI) | Turns any website URL into a searchable knowledge base you can chat with. Answers cite their source pages. | FastAPI · trafilatura · sentence-transformers · FAISS · Ollama |
 | 2 | [**OmniRAG**](./2.%20OmniRAG) | Multimodal RAG over documents, images, audio and video. Ask in text or with an image; answers cite pages, pictures and timestamps. | FastAPI · PyMuPDF · Whisper · CLIP · Tesseract · FAISS · Ollama |
+| 📚 | [**RAG Fundamentals**](./RAG%20Fundamentals) | 39 notebooks that walk through RAG techniques, from a simple baseline to GraphRAG, Self-RAG and evaluation. | Jupyter · sentence-transformers · rank_bm25 · networkx · Ollama |
 
 > More projects coming soon.
 
@@ -76,6 +77,25 @@ cd "2. OmniRAG" && ./run.sh               # → http://localhost:8001
 ```
 
 [Read the full OmniRAG docs →](./2.%20OmniRAG/README.md)
+
+### 📚 RAG Fundamentals — 39 Techniques, One Notebook Each
+
+A guided learning path through the RAG techniques that matter, ordered from the simple baseline to
+advanced architectures. Every technique lives in its own folder with a runnable notebook, all sharing
+one small local toolkit (`common.py`) and sample data.
+
+- **Basics:** simple, CSV and JSON RAG, reliable RAG, chunk size, proposition chunking
+- **Evaluation:** DeepEval, GroUSE-style judges, end-to-end and reference-free evaluation
+- **Query and context side:** query transformations, HyDE, HyPE, semantic chunking, compression, RSE
+- **Retrieval:** fusion (BM25 + vectors), reranking, MMR / Dartboard, hierarchical indices, multimodal (captioning, ColPali)
+- **Iterative and advanced:** feedback loops, adaptive retrieval, CRAG, Self-RAG, GraphRAG, LightRAG, RAPTOR, MemoRAG, agentic RAG
+
+```bash
+ollama serve && ollama pull llama3.2
+cd "RAG Fundamentals" && pip install -r requirements.txt && jupyter lab
+```
+
+[Browse the full learning path →](./RAG%20Fundamentals/README.md)
 
 ## Getting started
 

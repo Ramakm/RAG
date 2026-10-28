@@ -1,0 +1,11 @@
+product_id,name,category,price_usd,rating,in_stock,description
+P001,AeroBook 14,Laptop,1199,4.6,yes,Lightweight 14 inch laptop with 18 hour battery and 16GB RAM
+P002,AeroBook 16 Pro,Laptop,1899,4.8,yes,16 inch creator laptop with dedicated GPU and 32GB RAM
+P003,PixelBuds Mini,Audio,79,4.2,yes,Compact wireless earbuds with 6 hour battery and noise isolation
+P004,PixelBuds ANC,Audio,149,4.5,no,Wireless earbuds with active noise cancellation and wireless charging case
+P005,StudioMonitor 27,Monitor,449,4.7,yes,27 inch 4K monitor with 99 percent sRGB coverage for colour accurate work
+P006,GameView 32,Monitor,599,4.4,yes,32 inch curved 165Hz gaming monitor with 1ms response time
+P007,TypeMaster K2,Keyboard,129,4.3,yes,Wireless mechanical keyboard with hot-swappable switches and RGB lighting
+P008,ErgoMouse X,Mouse,59,4.1,no,Ergonomic vertical mouse with adjustable DPI up to 4000
+P009,PowerHub 100W,Charger,49,4.6,yes,100 watt GaN charger with four ports that can charge a laptop and phone together
+P010,TrailCam Z,Camera,329,4.0,yes,Waterproof action camera that records 4K video at 60 frames per second

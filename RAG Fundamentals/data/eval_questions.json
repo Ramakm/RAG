@@ -1,12 +1,102 @@
 [
-  {"question": "How many dimensions does the all-MiniLM-L6-v2 embedding model produce?", "answer": "384 dimensions", "evidence": "384-dimensional vectors"},
-  {"question": "What constant is used in the Reciprocal Rank Fusion formula?", "answer": "60", "evidence": "1 divided by (60 plus rank)"},
-  {"question": "Which reranker model is described as small and widely used?", "answer": "cross-encoder/ms-marco-MiniLM-L-6-v2", "evidence": "cross-encoder/ms-marco-MiniLM-L-6-v2 is a small"},
-  {"question": "What does HyDE stand for and how does it work?", "answer": "Hypothetical Document Embedding; the LLM writes a fake answer and the system searches with its embedding.", "evidence": "write a fake answer"},
-  {"question": "What is mean reciprocal rank?", "answer": "The average of 1 divided by the rank of the first correct result.", "evidence": "1 divided by the rank of the first correct result"},
-  {"question": "Which algorithm does Microsoft GraphRAG use to detect communities?", "answer": "The Leiden algorithm", "evidence": "Leiden algorithm"},
-  {"question": "What similarity threshold is suggested for a semantic cache?", "answer": "A cosine similarity above 0.95", "evidence": "above a cosine similarity of 0.95"},
-  {"question": "What is indirect prompt injection?", "answer": "A malicious document contains instructions that try to hijack the model.", "evidence": "indirect prompt injection"},
-  {"question": "What chunk size and overlap are a common starting point?", "answer": "About 500 to 1000 characters with 10 to 20 percent overlap.", "evidence": "500 to 1000 characters with 10 to 20 percent overlap"},
-  {"question": "How many candidates are typically passed to a cross-encoder reranker?", "answer": "The top 20 to 50 candidates.", "evidence": "top 20 to 50 candidates"}
+  {
+    "question": "How many dimensions does the all-MiniLM-L6-v2 embedding model produce?",
+    "answer": "384 dimensions",
+    "evidence": "384-dimensional vectors"
+  },
+  {
+    "question": "What constant is used in the Reciprocal Rank Fusion formula?",
+    "answer": "60",
+    "evidence": "1 divided by (60 plus rank)"
+  },
+  {
+    "question": "Which reranker model is described as small and widely used?",
+    "answer": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+    "evidence": "cross-encoder/ms-marco-MiniLM-L-6-v2 is a small"
+  },
+  {
+    "question": "What does HyDE stand for and how does it work?",
+    "answer": "Hypothetical Document Embedding; the LLM writes a fake answer and the system searches with its embedding.",
+    "evidence": "write a fake answer"
+  },
+  {
+    "question": "What is mean reciprocal rank?",
+    "answer": "The average of 1 divided by the rank of the first correct result.",
+    "evidence": "1 divided by the rank of the first correct result"
+  },
+  {
+    "question": "Which algorithm does Microsoft GraphRAG use to detect communities?",
+    "answer": "The Leiden algorithm",
+    "evidence": "Leiden algorithm"
+  },
+  {
+    "question": "What similarity threshold is suggested for a semantic cache?",
+    "answer": "A cosine similarity above 0.95",
+    "evidence": "above a cosine similarity of 0.95"
+  },
+  {
+    "question": "What is indirect prompt injection?",
+    "answer": "A malicious document contains instructions that try to hijack the model.",
+    "evidence": "indirect prompt injection"
+  },
+  {
+    "question": "What chunk size and overlap are a common starting point?",
+    "answer": "About 500 to 1000 characters with 10 to 20 percent overlap.",
+    "evidence": "500 to 1000 characters with 10 to 20 percent overlap"
+  },
+  {
+    "question": "How many candidates are typically passed to a cross-encoder reranker?",
+    "answer": "The top 20 to 50 candidates.",
+    "evidence": "top 20 to 50 candidates"
+  },
+  {
+    "question": "Why are cross-encoders applied only to a few candidates?",
+    "answer": "Because cross-encoders are slow, they are only applied to the top 20 to 50 candidates.",
+    "evidence": "cross-encoders are slow"
+  },
+  {
+    "question": "Which index types trade a little recall for large speed gains?",
+    "answer": "Approximate nearest neighbour indexes such as HNSW and IVF.",
+    "evidence": "HNSW and IVF"
+  },
+  {
+    "question": "Where does semantic chunking place chunk boundaries?",
+    "answer": "Where the topic shifts, detected by comparing neighbouring sentence embeddings.",
+    "evidence": "boundaries where the topic shifts"
+  },
+  {
+    "question": "What does the faithfulness metric check?",
+    "answer": "That every claim in the answer is supported by the context.",
+    "evidence": "every claim is supported by the context"
+  },
+  {
+    "question": "What should a system do when the retrieved context lacks the answer?",
+    "answer": "Say that it does not know instead of guessing.",
+    "evidence": "say that it does not know"
+  },
+  {
+    "question": "Why is fine-tuning a poor way to update facts?",
+    "answer": "Updating a fine-tuned model requires another training run.",
+    "evidence": "updating a fine-tuned model requires another training run"
+  },
+  {
+    "question": "What is step-back prompting?",
+    "answer": "Asking a more general question first to fetch broader background.",
+    "evidence": "Step-back prompting asks a more general question first"
+  },
+  {
+    "question": "How does a knowledge graph represent facts?",
+    "answer": "As triples of subject, relation and object.",
+    "evidence": "facts as triples of subject, relation and object"
+  },
+  {
+    "question": "How can prompt injection through retrieved text be mitigated?",
+    "answer": "Separate instructions from context, filter retrieved text and limit the tools the model may call.",
+    "evidence": "separating instructions from context"
+  },
+  {
+    "question": "How does hybrid search combine keyword and vector search?",
+    "answer": "It runs both and merges the rankings, e.g. with a weighted score or Reciprocal Rank Fusion.",
+    "evidence": "runs both and merges the rankings"
+  }
 ]

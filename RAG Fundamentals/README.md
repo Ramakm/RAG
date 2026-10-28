@@ -7,7 +7,7 @@ A guided path through 39 RAG techniques, one notebook per folder, ordered from t
 ```bash
 pip install -r requirements.txt
 ollama pull llama3.2        # generation + judging
-ollama pull llava           # only for notebook 22 (image captioning)
+ollama pull qwen2.5vl:3b           # only for notebook 22 (image captioning)
 ollama serve
 jupyter lab
 ```

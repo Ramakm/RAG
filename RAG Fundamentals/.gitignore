@@ -1,0 +1,5 @@
+.cache/
+__pycache__/
+*.db
+data/feedback.json
+.ipynb_checkpoints/

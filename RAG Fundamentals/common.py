@@ -6,14 +6,20 @@ and plain numpy for the vector store, so every notebook stays readable.
 import json
 import os
 import re
+import warnings
 from pathlib import Path
 
 import numpy as np
 
+os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
+os.environ.setdefault("HF_HUB_DISABLE_PROGRESS_BARS", "1")
+os.environ.setdefault("HF_HUB_DISABLE_TELEMETRY", "1")
+warnings.filterwarnings("ignore")
+
 ROOT = Path(__file__).parent
 DATA = ROOT / "data"
 LLM_MODEL = os.getenv("RAG_LLM", "llama3.2")
-VISION_MODEL = os.getenv("RAG_VISION", "llava")
+VISION_MODEL = os.getenv("RAG_VISION", "qwen2.5vl:3b")
 EMBED_MODEL = os.getenv("RAG_EMBED", "all-MiniLM-L6-v2")
 
 _embedder = None
@@ -25,22 +31,52 @@ def embed(texts):
     global _embedder
     if _embedder is None:
         from sentence_transformers import SentenceTransformer
+        from transformers.utils import logging as hf_logging
 
-        _embedder = SentenceTransformer(EMBED_MODEL)
+        hf_logging.set_verbosity_error()
+        hf_logging.disable_progress_bar()
+        # tiny model: run on CPU so the GPU memory stays free for Ollama
+        _embedder = SentenceTransformer(EMBED_MODEL, device="cpu")
     if isinstance(texts, str):
         texts = [texts]
-    return np.asarray(_embedder.encode(list(texts), normalize_embeddings=True), dtype="float32")
+    return np.asarray(_embedder.encode(list(texts), normalize_embeddings=True, show_progress_bar=False), dtype="float32")
 
 
-def llm(prompt, system="You are a helpful assistant.", temperature=0.0):
+CACHE_DIR = ROOT / ".cache"
+_llm_cache = None
+
+
+def _cache_path():
+    CACHE_DIR.mkdir(exist_ok=True)
+    return CACHE_DIR / "llm_cache.json"
+
+
+def llm(prompt, system="You are a helpful assistant.", temperature=0.0, use_cache=True):
+    """Chat with the local Ollama model. Deterministic calls (temperature 0) are cached on disk,
+    so re-running a notebook is instant and gives identical output. Delete `.cache/` to reset."""
+    global _llm_cache
+    import hashlib
+
     import ollama
 
+    key = hashlib.sha256(f"{LLM_MODEL}|{system}|{prompt}|{temperature}".encode()).hexdigest()
+    cacheable = use_cache and temperature == 0.0
+    if cacheable:
+        if _llm_cache is None:
+            path = _cache_path()
+            _llm_cache = json.loads(path.read_text()) if path.exists() else {}
+        if key in _llm_cache:
+            return _llm_cache[key]
     reply = ollama.chat(
         model=LLM_MODEL,
         messages=[{"role": "system", "content": system}, {"role": "user", "content": prompt}],
-        options={"temperature": temperature},
+        options={"temperature": temperature, "seed": 7},
     )
-    return reply["message"]["content"].strip()
+    text = reply["message"]["content"].strip()
+    if cacheable:
+        _llm_cache[key] = text
+        _cache_path().write_text(json.dumps(_llm_cache))
+    return text
 
 
 def llm_json(prompt, system="Reply with valid JSON only."):
@@ -162,6 +198,81 @@ def show(hits, width=160):
 def hit_at_k(hits, evidence):
     """True if any retrieved text contains the evidence phrase."""
     return any(evidence.lower() in h["text"].lower() for h in hits)
+
+
+def evidence_rank(hits, evidence):
+    """1-based rank of the first hit containing the evidence phrase, or None."""
+    for i, h in enumerate(hits, 1):
+        if evidence.lower() in h["text"].lower():
+            return i
+    return None
+
+
+def evaluate_retriever(search_fn, questions=None, k=3):
+    """Score a retriever on the golden set. `search_fn(question, k)` must return hit dicts.
+
+    Returns hit rate@k, MRR and the per-question ranks (None = evidence not retrieved).
+    """
+    questions = questions or load_eval_questions()
+    ranks = [evidence_rank(search_fn(q["question"], k), q["evidence"]) for q in questions]
+    return {
+        "hit_rate@1": round(sum(r == 1 for r in ranks) / len(ranks), 2),
+        f"hit_rate@{k}": round(sum(r is not None for r in ranks) / len(ranks), 2),
+        "MRR": round(sum(1 / r for r in ranks if r) / len(ranks), 2),
+        "ranks": ranks,
+    }
+
+
+def compare_retrievers(methods, questions=None, k=3):
+    """`methods` maps a name to a search_fn(question, k). Returns hit@1, hit@k and MRR per method."""
+    import pandas as pd
+
+    rows = []
+    for name, fn in methods.items():
+        r = evaluate_retriever(fn, questions, k)
+        rows.append({"method": name, "hit@1": r["hit_rate@1"], f"hit@{k}": r[f"hit_rate@{k}"], "MRR": r["MRR"]})
+    return pd.DataFrame(rows).set_index("method")
+
+
+def keyword_recall(reference, candidate):
+    """Fraction of the reference answer's content words/numbers that appear in the candidate."""
+    stop = {"the", "and", "that", "with", "from", "this", "which", "their", "for", "are", "its", "into"}
+    words = [w for w in re.findall(r"[a-z0-9.\-]+", reference.lower()) if len(w) > 3 or w.isdigit()]
+    words = [w.strip(".-") for w in words if w not in stop]
+    if not words:
+        return 1.0
+    cand = candidate.lower()
+    return round(sum(w in cand for w in words) / len(words), 2)
+
+
+def compare_pipelines(pipelines, questions=None, n=5):
+    """Run end-to-end pipelines (`name -> fn(question) -> answer`) on the first `n` golden questions.
+
+    Reports keyword recall (deterministic), an LLM-judge verdict and average latency per question.
+    """
+    import time
+
+    import pandas as pd
+
+    questions = (questions or load_eval_questions())[:n]
+    rows = []
+    for name, fn in pipelines.items():
+        recalls, judged, times = [], [], []
+        for q in questions:
+            t0 = time.time()
+            try:
+                response = fn(q["question"])
+            except Exception as e:  # keep the comparison going if one pipeline fails
+                response = f"ERROR: {e}"
+            times.append(time.time() - t0)
+            recalls.append(keyword_recall(q["answer"], response))
+            judged.append(llm_yes(
+                f"Reference answer: {q['answer']}\nCandidate answer: {response}\n"
+                "Does the candidate give the same key information as the reference?"))
+        rows.append({"pipeline": name, "keyword_recall": round(sum(recalls) / len(recalls), 2),
+                     "judge_correct": round(sum(judged) / len(judged), 2),
+                     "avg_seconds": round(sum(times) / len(times), 1)})
+    return pd.DataFrame(rows).set_index("pipeline")
 
 
 # ---------------------------------------------------------------- knowledge graph

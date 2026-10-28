@@ -42,7 +42,7 @@ grounded generation**, with a usable UI on top.
 | 1 | [**BrowseAI**](./1.%20BrowseAI) | Turns any website URL into a searchable knowledge base you can chat with. Answers cite their source pages. | FastAPI · trafilatura · sentence-transformers · FAISS · Ollama |
 | 2 | [**OmniRAG**](./2.%20OmniRAG) | Multimodal RAG over documents, images, audio and video. Ask in text or with an image; answers cite pages, pictures and timestamps. | FastAPI · PyMuPDF · Whisper · CLIP · Tesseract · FAISS · Ollama |
 | 3 | [**Agentic RAG**](./3.%20Agentic%20RAG) | A LangGraph agent that plans, retrieves from vector search and/or guarded SQL, grades evidence, retries weak queries and fact-checks its cited answers. | LangGraph · Chroma · FastAPI · Streamlit · sqlglot · Claude |
-| 📚 | [**RAG Fundamentals**](./RAG%20Fundamentals) | 39 notebooks that walk through RAG techniques, from a simple baseline to GraphRAG, Self-RAG and evaluation. | Jupyter · sentence-transformers · rank_bm25 · networkx · Ollama |
+| 0 | [**RAG Fundamentals**](./0.%20RAG%20Fundamentals) | 39 notebooks that walk through RAG techniques, from a simple baseline to GraphRAG, Self-RAG and evaluation. | Jupyter · sentence-transformers · rank_bm25 · networkx · Ollama |
 
 > More projects coming soon.
 
@@ -95,7 +95,7 @@ make demo && make ui              # → http://localhost:8501
 
 [Read the full Agentic RAG docs →](./3.%20Agentic%20RAG/README.md)
 
-### 📚 RAG Fundamentals — 39 Techniques, One Notebook Each
+### 0. RAG Fundamentals — 39 Techniques, One Notebook Each
 
 A guided learning path through the RAG techniques that matter, ordered from the simple baseline to
 advanced architectures. Every technique lives in its own folder with a runnable notebook, all sharing
@@ -109,10 +109,10 @@ one small local toolkit (`common.py`) and sample data.
 
 ```bash
 ollama serve && ollama pull llama3.2
-cd "RAG Fundamentals" && pip install -r requirements.txt && jupyter lab
+cd "0. RAG Fundamentals" && pip install -r requirements.txt && jupyter lab
 ```
 
-[Browse the full learning path →](./RAG%20Fundamentals/README.md)
+[Browse the full learning path →](./0.%20RAG%20Fundamentals/README.md)
 
 ## Getting started
 

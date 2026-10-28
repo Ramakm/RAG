@@ -19,7 +19,7 @@ warnings.filterwarnings("ignore")
 ROOT = Path(__file__).parent
 DATA = ROOT / "data"
 LLM_MODEL = os.getenv("RAG_LLM", "llama3.2")
-VISION_MODEL = os.getenv("RAG_VISION", "qwen2.5vl:3b")
+VISION_MODEL = os.getenv("RAG_VISION", "moondream")
 EMBED_MODEL = os.getenv("RAG_EMBED", "all-MiniLM-L6-v2")
 
 _embedder = None
@@ -106,10 +106,10 @@ def llm_yes(prompt):
     return out.lower().strip().startswith("yes")
 
 
-def llm_score(prompt, lo=1, hi=5):
+def llm_score(prompt, lo=1, hi=5, temperature=0.0, use_cache=True):
     """Ask for an integer score in [lo, hi] (reason first, then a final 'Score: N' line)."""
     out = llm(prompt + f"\nGive a one-sentence reason, then finish with a final line exactly like "
-                       f"'Score: N' where N is an integer from {lo} to {hi}.")
+                       f"'Score: N' where N is an integer from {lo} to {hi}.", temperature=temperature, use_cache=use_cache)
     found = re.findall(r"score:\s*\**\s*(\d+)", out.lower()) or re.findall(r"\b(\d+)\b", out)
     return min(max(int(found[-1]), lo), hi) if found else None
 

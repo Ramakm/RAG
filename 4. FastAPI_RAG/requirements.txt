@@ -1,0 +1,12 @@
+fastapi>=0.110
+uvicorn>=0.29
+python-multipart>=0.0.9
+streamlit>=1.35
+requests>=2.31
+pypdf>=4
+python-docx>=1.1
+numpy>=1.26
+sentence-transformers>=3
+transformers>=4.44
+torch>=2.2
+accelerate>=0.30

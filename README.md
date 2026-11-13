@@ -1,6 +1,6 @@
 <div align="center">
 
-# RAG — End-to-End Projects
+# RAG : Hands-on
 
 **Hands-on Retrieval-Augmented Generation projects, built to run locally with open-source models.**
 

@@ -1,0 +1,13 @@
+# Install uv 
+
+    - curl -LsSf https://astral.sh/uv/install.sh | sh [Macbook]
+
+    - powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex" [windows]
+
+# Create venv
+
+# Activate venv
+
+# uv init : This will help you to create project toml file
+    
+# We need install necessary libs, frameworks.....
